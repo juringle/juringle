@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Juringle - 뉴스로 찾는 관련주</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:sans-serif;background:#f8f9fa;}
+.wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem 1rem;}
+.logo{font-size:52px;font-weight:500;margin-bottom:8px;}
+.j1{color:#4285F4;}.j2{color:#EA4335;}.j3{color:#FBBC05;}
+.tagline{font-size:14px;color:#666;margin-bottom:36px;}
+.sbox{width:100%;max-width:560px;display:flex;align-items:center;background:white;border:1px solid #ddd;border-radius:28px;padding:10px 18px;}
+.sbox:focus-within{border-color:#4285F4;box-shadow:0 0 0 3px rgba(66,133,244,0.1);}
+.sinput{flex:1;border:none;outline:none;background:transparent;font-size:16px;color:#333;padding:0 12px;}
+.sinput::placeholder{color:#aaa;}
+.sbtn{background:#4285F4;color:white;border:none;border-radius:20px;padding:7px 18px;font-size:13px;cursor:pointer;}
+.sbtn:hover{background:#3367d6;}
+.notice{margin-top:20px;width:100%;max-width:560px;background:#E6F1FB;border:1px solid #B5D4F4;border-radius:8px;padding:10px 16px;}
+.ntext{font-size:13px;color:#0C447C;line-height:1.7;}
+.ntext b{font-weight:500;}
+.snum{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#4285F4;color:white;font-size:10px;font-weight:500;margin-right:4px;vertical-align:middle;}
+.resp{margin-top:8px;width:100%;max-width:560px;text-align:center;font-size:12px;color:#A32D2D;}
+.loading{text-align:center;font-size:14px;color:#666;padding:32px;display:none;width:100%;max-width:560px;} .spinner{width:36px;height:36px;border:3px solid #e0e0e0;border-top:3px solid #4285F4;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;} @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+.rbox{width:100%;max-width:560px;margin-top:16px;display:none;}
+.rinner{background:white;border:1px solid #e0e0e0;border-radius:12px;padding:20px 24px;font-size:14px;line-height:1.8;color:#333;white-space:pre-wrap;}
+.disc{margin-top:10px;font-size:12px;color:#A32D2D;background:#FCEBEB;border:1px solid #F7C1C1;border-radius:8px;padding:8px 12px;}
+.summary{background:white;border:1px solid #e0e0e0;border-radius:12px;padding:16px 20px;font-size:14px;line-height:1.7;color:#333;margin-bottom:12px;}
+.tabs{display:flex;gap:8px;margin-bottom:12px;}
+.tab{flex:1;padding:10px;border:1px solid #ddd;border-radius:8px;background:white;font-size:14px;cursor:pointer;color:#666;}
+.tab.active{color:white;border-color:transparent;} #tab-good.active{background:#E53935;} #tab-bad.active{background:#1565C0;}
+.tpanel{display:flex;flex-direction:column;gap:10px;}
+.stock-card{background:white;border:1px solid #e0e0e0;border-radius:12px;padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:2px;word-break:keep-all;word-wrap:break-word;overflow-wrap:break-word;}
+.stock-card.good{border-left:4px solid #E53935;background:#FFF5F5;} .stock-card.bad{border-left:4px solid #1565C0;background:#F0F4FF;}
+
+.stock-name{font-size:16px;font-weight:700;color:#222;margin-bottom:4px;}
+.stock-point{font-size:13px;color:#4285F4;margin-bottom:8px;}
+.stock-row{font-size:13px;color:#555;line-height:1.6;}
+.stock-label{color:#999;margin-right:4px;}
+.tip{background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:10px 14px;font-size:13px;color:#795548;margin-top:4px;} .warn{font-size:11px;color:#EA4335;font-weight:500;}
+.stock-price-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.price{font-size:18px;font-weight:700;color:#222;}
+.price-change{font-size:13px;font-weight:500;padding:2px 6px;border-radius:4px;}
+.price-change.up{color:#E53935;background:#FFF0F0;}
+.price-change.down{color:#1565C0;background:#F0F4FF;}
+.price-na{font-size:12px;color:#999;} .price-label{font-size:10px;color:#999;background:#f5f5f5;padding:2px 5px;border-radius:3px;margin-left:4px;} .naver-btn{display:inline-block;margin-top:8px;font-size:12px;color:#03C75A;text-decoration:none;font-weight:500;} .naver-btn:hover{text-decoration:underline;}
+.footer{margin-top:48px;font-size:12px;color:#aaa;display:flex;gap:16px;}
+@media (max-width: 600px) {
+    .wrap{padding:1.5rem 0.8rem;}
+    .sbox{padding:8px 14px;}
+    .sinput{font-size:14px;}
+    .sbtn{padding:8px 14px;font-size:13px;}
+    .logo{font-size:40px;}
+    .tab{padding:12px;font-size:15px;}
+    .stock-card{padding:14px 16px;}
+    .stock-name{font-size:15px;}
+    .price{font-size:16px;}
+    .summary{padding:14px 16px;}
+    .rbox{margin-top:12px;}
+    .tabs{gap:6px;}
+}
+.footer a{color:#aaa;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a href="/" style="text-decoration:none"><div class="logo"><span class="j1">J</span><span class="j2">u</span><span class="j3">r</span><span class="j1">i</span><span class="j5">n</span><span class="j2">g</span><span class="j1">l</span><span class="j5">e</span></div></a>
+<div class="tagline">뉴스 링크 하나로 관련 주식을 찾아드려요</div>
+<div class="sbox">
+<input class="sinput" id="sinput" placeholder="뉴스 기사 URL을 붙여넣으세요..." />
+<button class="sbtn" id="sbtn">분석</button>
+</div>
+
+<div class="resp">⚠️ 본 서비스는 AI 분석 참고용이며, 투자 책임은 본인에게 있습니다.</div>
+<div class="loading" id="loading"><div class="spinner"></div><div id="loading-msg">기사 읽는 중...</div></div>
+<div class="rbox" id="rbox">
+<div class="summary" id="summary"></div>
+<div class="tabs">
+    <button class="tab active" id="tab-good" onclick="showTab('good')">👍 호재 종목</button>
+    <button class="tab" id="tab-bad" onclick="showTab('bad')">👎 악재 종목</button>
+</div>
+<div class="tpanel" id="panel-good"></div>
+<div class="tpanel" id="panel-bad" style="display:none"></div>
+<div class="disc">⚠️ 이 분석은 AI가 생성한 참고용 정보입니다. 투자 권유가 아니며, 투자 책임은 본인에게 있습니다.</div>
+</div>
+<div class="footer"><a href="#">서비스 소개</a><a href="#">이용약관</a><a href="#">면책고지</a></div>
+</div>
+<script>
+function showTab(type) {
+    document.getElementById('panel-good').style.display = type === 'good' ? 'flex' : 'none';
+    document.getElementById('panel-bad').style.display = type === 'bad' ? 'flex' : 'none';
+    document.getElementById('tab-good').className = 'tab' + (type === 'good' ? ' active' : '');
+    document.getElementById('tab-bad').className = 'tab' + (type === 'bad' ? ' active' : '');
+}
+function renderStocks(stocks, type) {
+    if (!stocks || stocks.length === 0) return '<div style="color:#999;font-size:14px;padding:12px">관련 종목이 없습니다.</div>';
+    return stocks.map(function(s) {
+        return '<div class="stock-card ' + type + '">' +
+            '<div class="stock-header">' +
+            '<div class="stock-name">' + 
+            (s.verified === false ? 
+                '<span style="color:#999;text-decoration:line-through">' + s.name + ' (' + s.ticker + ')</span> <span class="warn">⚠️ 티커 오류</span>' :
+                (s.real_name && s.real_name !== s.name ? 
+                    s.real_name + ' (' + s.ticker + ')' :
+                    s.name + ' (' + s.ticker + ')'
+                )
+            ) + 
+            '</div>' +
+            '</div>' +
+            '<div class="stock-price-row">' +
+            (s.price ? 
+                '<span class="price">' + s.price.price + '원</span>' + '<span class="price-label">전일 종가</span>' +
+                '<span class="price-change ' + (s.price.is_up ? 'up' : 'down') + '">' + s.price.change_pct + '</span>'
+                : '<span class="price-na">주가 정보 없음</span>'
+            ) +
+            '</div>' +
+            '<div class="stock-point">' + s.point + '</div>' +
+            '<div class="stock-row"><span class="stock-label">' + (type === 'good' ? '수혜 이유' : '악재 이유') + '</span>' + s.reason + '</div>' +
+            '<div class="stock-row"><span class="stock-label">주목 포인트</span>' + s.check + '</div>' +
+            '<a class="naver-btn" href="https://finance.naver.com/item/main.naver?code=' + s.ticker + '" target="_blank">네이버 증권에서 확인 →</a>' +
+            '</div>';
+    }).join('');
+}
+function go() {
+    var u = document.getElementById('sinput').value.trim();
+    if (!u) { alert('URL을 입력해주세요!'); return; }
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('rbox').style.display = 'none';
+    var msgs = ['📰 기사 읽는 중...', '🔍 AI가 종목 분석 중...', '📊 관련주 검증 중...', '✅ 거의 다 됐어요...'];
+    var mi = 0;
+    var mt = setInterval(function() {
+        mi = (mi + 1) % msgs.length;
+        var el = document.getElementById('loading-msg');
+        if (el) el.innerHTML = msgs[mi];
+    }, 7000);
+    var x = new XMLHttpRequest();
+    x.open('POST', '/analyze', true);
+    x.setRequestHeader('Content-Type', 'application/json');
+    x.onload = function() {
+        clearInterval(mt);
+        document.getElementById('loading').style.display = 'none';
+        var d = JSON.parse(x.responseText);
+        if (d.error) {
+            document.getElementById('summary').innerHTML = '<span style="color:#EA4335">❌ ' + d.error + '</span>';
+            document.getElementById('rbox').style.display = 'block';
+            return;
+        }
+        try {
+            var r = JSON.parse(d.result);
+            document.getElementById('summary').innerHTML = '📰 ' + r.summary + (r.tip ? '<div class="tip">💡 ' + r.tip + '</div>' : '');
+            document.getElementById('panel-good').innerHTML = renderStocks(r.good, 'good');
+            document.getElementById('panel-bad').innerHTML = renderStocks(r.bad, 'bad');
+            var hasBad = r.bad && r.bad.length > 0;
+            document.getElementById('tab-bad').style.display = hasBad ? 'block' : 'none';
+            document.getElementById('rbox').style.display = 'block';
+            showTab('good');
+        } catch(e) {
+            document.getElementById('summary').innerHTML = d.result;
+            document.getElementById('rbox').style.display = 'block';
+        }
+    };
+    x.send(JSON.stringify({url: u}));
+}
+document.getElementById('sbtn').onclick = go;
+document.getElementById('sinput').onkeypress = function(e) { if (e.keyCode === 13) go(); };
+</script>
+</body>
+</html>
