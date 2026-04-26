@@ -238,17 +238,20 @@ def get_today_news():
             "X-Naver-Client-Id": os.getenv("NAVER_CLIENT_ID"),
             "X-Naver-Client-Secret": os.getenv("NAVER_CLIENT_SECRET")
         }
-        import random
-        queries = ["주식 증시 코스피", "경제 금융 시장", "환율 금리 무역", "국제 외교 경제"]
-        params = {"query": random.choice(queries), "display": 10, "sort": "date"}
-        res = requests.get("https://openapi.naver.com/v1/search/news.json", headers=headers, params=params, timeout=5)
-        data = res.json()
+        queries = ["주식 증시 코스피", "경제 금융 환율", "국제 외교 무역", "정치 정책 산업"]
         news_list = []
-        for item in data.get("items", []):
-            title = item["title"].replace("<b>", "").replace("</b>", "").replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&").replace("&quot;", '"')
-            link = item.get("originallink") or item.get("link")
-            news_list.append({"title": title, "link": link})
-        return news_list
+        seen = set()
+        for query in queries:
+            params = {"query": query, "display": 5, "sort": "date"}
+            res = requests.get("https://openapi.naver.com/v1/search/news.json", headers=headers, params=params, timeout=5)
+            data = res.json()
+            for item in data.get("items", []):
+                title = item["title"].replace("<b>", "").replace("</b>", "").replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&").replace("&quot;", '"')
+                link = item.get("originallink") or item.get("link")
+                if title not in seen:
+                    seen.add(title)
+                    news_list.append({"title": title, "link": link})
+        return news_list[:10]
     except:
         return []
 
