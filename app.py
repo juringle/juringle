@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify, render_template_string
+import threading
+import time
 from collections import defaultdict
 from datetime import datetime
 
@@ -46,6 +48,24 @@ def save_analysis(url, summary, stocks):
 load_dotenv()
 
 app = Flask(__name__)
+
+# gunicorn 시작시 자동 실행
+import os
+if os.environ.get('GUNICORN_CMD_ARGS') or not __name__ == '__main__':
+    pass
+
+# 뉴스 캐시
+news_cache = []
+
+def refresh_news_cache():
+    global news_cache
+    while True:
+        news_cache = get_today_news()
+        time.sleep(3600)  # 1시간마다 갱신
+
+def start_news_refresh():
+    t = threading.Thread(target=refresh_news_cache, daemon=True)
+    t.start()
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 def get_title_from_url(url):
@@ -320,8 +340,10 @@ def index():
 
 @app.route("/today-news")
 def today_news():
-    news = get_today_news()
-    return jsonify({"news": news})
+    global news_cache
+    if not news_cache:
+        news_cache = get_today_news()
+    return jsonify({"news": news_cache})
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
