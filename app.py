@@ -1,4 +1,6 @@
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template_string, redirect, url_for, session
+from authlib.integrations.flask_client import OAuth
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 import threading
 import time
 from collections import defaultdict
@@ -48,6 +50,34 @@ def save_analysis(url, summary, stocks):
 load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY", "juringle-secret-2026")
+
+# OAuth 설정
+oauth = OAuth(app)
+google = oauth.register(
+    name='google',
+    client_id=os.getenv("GOOGLE_CLIENT_ID"),
+    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={'scope': 'openid email profile'}
+)
+
+# 로그인 매니저
+login_manager = LoginManager(app)
+
+# 간단한 유저 저장소
+users = {}
+
+class User(UserMixin):
+    def __init__(self, id, email, name, picture):
+        self.id = id
+        self.email = email
+        self.name = name
+        self.picture = picture
+
+@login_manager.user_loader
+def load_user(user_id):
+    return users.get(user_id)
 
 # gunicorn 시작시 자동 실행
 import os
@@ -282,6 +312,44 @@ def get_today_news():
         return []
 
 
+
+
+@app.route("/login")
+def login():
+    redirect_uri = url_for('callback', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route("/callback")
+def callback():
+    token = google.authorize_access_token()
+    userinfo = token.get('userinfo')
+    if userinfo:
+        user_id = userinfo['sub']
+        user = User(
+            id=user_id,
+            email=userinfo['email'],
+            name=userinfo.get('name', ''),
+            picture=userinfo.get('picture', '')
+        )
+        users[user_id] = user
+        login_user(user)
+    return redirect('/')
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect('/')
+
+@app.route("/me")
+def me():
+    if current_user.is_authenticated:
+        return jsonify({
+            "logged_in": True,
+            "name": current_user.name,
+            "email": current_user.email,
+            "picture": current_user.picture
+        })
+    return jsonify({"logged_in": False})
 
 @app.route("/about")
 def about():
