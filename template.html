@@ -76,7 +76,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sa
 </head>
 <body>
 <div class="wrap">
-<a href="/" style="text-decoration:none"><div id="user-area" style="position:fixed;top:12px;right:12px;z-index:999;"></div>
+<a href="/" style="text-decoration:none"><div id="user-area" style="position:fixed;top:12px;right:12px;z-index:999;">
+</div>
+<style>
+@media (max-width: 480px) {
+  #user-area {
+    position:static !important;
+    text-align:center;
+    margin: 8px auto 0;
+    display:block;
+  }
+  #user-area a {
+    display:inline-flex !important;
+    font-size:12px !important;
+    padding:6px 12px !important;
+  }
+}
+</style>
 <div class="logo"><span class="j1">J</span><span class="j2">u</span><span class="j3">r</span><span class="j1">i</span><span class="j5">n</span><span class="j2">g</span><span class="j1">l</span><span class="j5">e</span></div></a>
 <div class="tagline">뉴스 링크 하나로 관련 주식을 찾아드려요</div>
 
