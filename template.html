@@ -79,6 +79,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sa
 <a href="/" style="text-decoration:none"><div class="logo"><span class="j1">J</span><span class="j2">u</span><span class="j3">r</span><span class="j1">i</span><span class="j5">n</span><span class="j2">g</span><span class="j1">l</span><span class="j5">e</span></div></a>
 <div class="tagline">뉴스 링크 하나로 관련 주식을 찾아드려요</div>
 <div id="user-area" style="margin-top:12px;font-size:14px;"></div>
+<script>
+fetch('/me').then(r=>r.json()).then(data=>{
+    const area = document.getElementById('user-area');
+    if(data.logged_in){
+        area.innerHTML = '<img src="'+data.picture+'" style="width:28px;height:28px;border-radius:50%;vertical-align:middle;margin-right:8px;">'
+            + '<span style="color:#555;">'+data.name+'</span>'
+            + ' <a href="/logout" style="color:#EA4335;margin-left:12px;font-size:13px;">로그아웃</a>';
+    } else {
+        area.innerHTML = '<a href="/login" style="background:#4285F4;color:white;padding:8px 20px;border-radius:20px;text-decoration:none;font-size:14px;">🔑 구글로 로그인</a>';
+    }
+});
+</script>
 <div class="sbox">
 <input class="sinput" id="sinput" placeholder="뉴스 기사 URL을 붙여넣으세요..." />
 <button class="sbtn" id="sbtn">분석</button>
