@@ -1,4 +1,10 @@
 from flask import Flask, request, jsonify, render_template_string
+from collections import defaultdict
+from datetime import datetime
+
+# IP별 사용량 추적
+usage_tracker = defaultdict(lambda: {"count": 0, "date": ""})
+DAILY_LIMIT = 5
 import anthropic
 import requests
 from bs4 import BeautifulSoup
@@ -255,6 +261,58 @@ def get_today_news():
     except:
         return []
 
+
+@app.route("/privacy")
+def privacy():
+    return render_template_string("""
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>개인정보처리방침 - Juringle</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:20px;line-height:1.8;color:#333;}h1{color:#4285F4;}h2{margin-top:30px;}</style>
+</head>
+<body>
+<h1>개인정보처리방침</h1>
+<p>Juringle(이하 "서비스")은 이용자의 개인정보를 중요시하며, 개인정보보호법을 준수합니다.</p>
+<h2>1. 수집하는 개인정보</h2>
+<p>서비스 이용 시 별도의 개인정보를 수집하지 않습니다. 향후 로그인 기능 추가 시 이메일 주소를 수집할 수 있습니다.</p>
+<h2>2. 개인정보의 이용목적</h2>
+<p>수집된 개인정보는 서비스 제공 및 개선 목적으로만 사용됩니다.</p>
+<h2>3. 개인정보의 보유기간</h2>
+<p>서비스 탈퇴 시 즉시 삭제됩니다.</p>
+<h2>4. 개인정보의 제3자 제공</h2>
+<p>이용자의 개인정보를 제3자에게 제공하지 않습니다.</p>
+<h2>5. 문의</h2>
+<p>개인정보 관련 문의: juringle.official@gmail.com</p>
+<p><a href="/">← 홈으로</a></p>
+</body></html>
+""")
+
+@app.route("/terms")
+def terms():
+    return render_template_string("""
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>이용약관 - Juringle</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:20px;line-height:1.8;color:#333;}h1{color:#4285F4;}h2{margin-top:30px;}</style>
+</head>
+<body>
+<h1>이용약관</h1>
+<h2>제1조 (목적)</h2>
+<p>이 약관은 Juringle(이하 "서비스")의 이용조건 및 절차에 관한 사항을 규정합니다.</p>
+<h2>제2조 (서비스 내용)</h2>
+<p>서비스는 뉴스 기사 URL을 입력받아 AI를 통해 관련 주식 종목을 분석하는 정보 제공 서비스입니다.</p>
+<h2>제3조 (면책조항)</h2>
+<p>본 서비스는 투자 참고용 정보만을 제공하며, 투자 권유가 아닙니다. 투자 결과에 대한 책임은 이용자 본인에게 있습니다.</p>
+<h2>제4조 (서비스 변경 및 중단)</h2>
+<p>서비스는 운영상 필요에 따라 사전 고지 없이 변경되거나 중단될 수 있습니다.</p>
+<h2>제5조 (문의)</h2>
+<p>서비스 관련 문의: juringle.official@gmail.com</p>
+<p><a href="/">← 홈으로</a></p>
+</body></html>
+""")
+
 @app.route("/")
 def index():
     return render_template_string(HTML)
@@ -268,6 +326,14 @@ def today_news():
 @app.route("/analyze", methods=["POST"])
 def analyze():
     import json as jsonlib
+    # IP 기반 사용량 체크
+    ip = request.remote_addr
+    today = datetime.now().strftime("%Y-%m-%d")
+    if usage_tracker[ip]["date"] != today:
+        usage_tracker[ip] = {"count": 0, "date": today}
+    if usage_tracker[ip]["count"] >= DAILY_LIMIT:
+        return jsonify({"error": f"하루 {DAILY_LIMIT}회 무료 분석을 모두 사용했어요. 내일 다시 이용해주세요! 😊"})
+    usage_tracker[ip]["count"] += 1
     data = request.json
     url = data.get("url")
     if not url:
