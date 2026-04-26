@@ -54,6 +54,10 @@ app.secret_key = os.getenv("SECRET_KEY", "juringle-secret-2026")
 
 # OAuth 설정
 oauth = OAuth(app)
+# HTTPS 강제 설정
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
 google = oauth.register(
     name='google',
     client_id=os.environ.get("GOOGLE_CLIENT_ID", ""),
