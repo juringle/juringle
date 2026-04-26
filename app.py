@@ -282,6 +282,53 @@ def get_today_news():
         return []
 
 
+
+@app.route("/about")
+def about():
+    return render_template_string("""
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>서비스 소개 - Juringle</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:20px;line-height:1.8;color:#333;}
+h1{font-size:2rem;} .j1{color:#4285F4;}.j2{color:#EA4335;}.j3{color:#FBBC05;}.j4{color:#34A853;}
+.card{background:#f8f9fa;border-radius:12px;padding:20px;margin:20px 0;}
+.tag{display:inline-block;background:#e8f0fe;color:#4285F4;padding:4px 12px;border-radius:20px;font-size:14px;margin:4px;}
+</style>
+</head>
+<body>
+<h1><span class="j1">J</span><span class="j2">u</span><span class="j3">r</span><span class="j4">i</span><span class="j1">n</span><span class="j2">g</span><span class="j3">l</span><span class="j4">e</span></h1>
+<p style="font-size:1.2rem;color:#666;">뉴스 링크 하나로 관련 주식을 찾아드려요</p>
+
+<div class="card">
+<h2>🔍 이런 서비스예요</h2>
+<p>뉴스 기사 URL을 붙여넣으면 AI가 관련 한국 주식 종목을 분석해드려요. 호재/악재 종목을 한눈에 파악하고, 시장이 아직 주목하지 못한 숨겨진 수혜주까지 발굴해드립니다.</p>
+</div>
+
+<div class="card">
+<h2>✨ 주요 기능</h2>
+<span class="tag">뉴스 URL 분석</span>
+<span class="tag">호재/악재 분류</span>
+<span class="tag">관련주 자동 발굴</span>
+<span class="tag">오늘의 경제 뉴스</span>
+<span class="tag">종목 주가 확인</span>
+</div>
+
+<div class="card">
+<h2>⚠️ 유의사항</h2>
+<p>본 서비스는 AI가 생성한 참고용 정보를 제공합니다. 투자 권유가 아니며, 모든 투자 결정과 책임은 이용자 본인에게 있습니다.</p>
+</div>
+
+<div class="card">
+<h2>📩 문의</h2>
+<p>juringle.official@gmail.com</p>
+</div>
+
+<p><a href="/">← 홈으로</a></p>
+</body></html>
+""")
+
 @app.route("/privacy")
 def privacy():
     return render_template_string("""
