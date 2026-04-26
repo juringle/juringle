@@ -143,10 +143,12 @@ function go() {
     document.getElementById('loading').style.display = 'block';
     document.getElementById('rbox').style.display = 'none';
     var msgs = ['📰 기사 읽는 중...', '🔍 AI가 종목 분석 중...', '📊 관련주 검증 중...', '✅ 거의 다 됐어요...'];
+    var msgDone = false;
     var mi = 0;
     var mt = setInterval(function() {
         mi = (mi + 1) % msgs.length;
         var el = document.getElementById('loading-msg');
+        if(msgDone) return;
         if (el) el.innerHTML = msgs[mi];
     }, 7000);
     var x = new XMLHttpRequest();
@@ -154,7 +156,7 @@ function go() {
     x.setRequestHeader('Content-Type', 'application/json');
     x.onload = function() {
         clearInterval(mt);
-        document.getElementById('loading').style.display = 'none';
+        msgDone = false; document.getElementById('loading').style.display = 'none';
         var d = JSON.parse(x.responseText);
         if (d.error) {
             document.getElementById('summary').innerHTML = '<span style="color:#EA4335">❌ ' + d.error + '</span>';
