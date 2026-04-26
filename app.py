@@ -238,7 +238,9 @@ def get_today_news():
             "X-Naver-Client-Id": os.getenv("NAVER_CLIENT_ID"),
             "X-Naver-Client-Secret": os.getenv("NAVER_CLIENT_SECRET")
         }
-        params = {"query": "주식 증시 코스피 종목", "display": 10, "sort": "date"}
+        import random
+        queries = ["주식 증시 코스피", "경제 금융 시장", "환율 금리 무역", "국제 외교 경제"]
+        params = {"query": random.choice(queries), "display": 10, "sort": "date"}
         res = requests.get("https://openapi.naver.com/v1/search/news.json", headers=headers, params=params, timeout=5)
         data = res.json()
         news_list = []
