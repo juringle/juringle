@@ -90,6 +90,7 @@ if os.environ.get('GUNICORN_CMD_ARGS') or not __name__ == '__main__':
 
 # 뉴스 캐시
 news_cache = []
+news_cache_time = datetime.now()
 
 def refresh_news_cache():
     global news_cache
@@ -459,9 +460,11 @@ def index():
 
 @app.route("/today-news")
 def today_news():
-    global news_cache
-    if not news_cache:
+    global news_cache, news_cache_time
+    now = datetime.now()
+    if not news_cache or (now - news_cache_time).seconds > 3600:
         news_cache = get_today_news()
+        news_cache_time = now
     return jsonify({"news": news_cache})
 
 @app.route("/analyze", methods=["POST"])
