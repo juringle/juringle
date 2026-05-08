@@ -650,19 +650,24 @@ def analyze():
 
     try:
         parsed = jsonlib.loads(result)
-        for stock in parsed.get("good", []) + parsed.get("bad", []):
+        blocked_names = ["한국거래소", "거래소", "협회", "기관", "정부", "지수", "ETF", "비상장"]
+        valid_good = []
+        for stock in parsed.get("good", []):
             ticker = stock.get("ticker", "")
             name = stock.get("name", "")
-            if ticker:
-                valid, real_name = verify_ticker(name, ticker)
-                if not valid:
-                    stock["verified"] = False
-                    continue
-                stock["verified"] = True
-                stock["real_name"] = real_name
-                price_info = get_stock_price(ticker)
-                if price_info:
-                    stock["price"] = price_info
+            if not ticker or any(word in name for word in blocked_names):
+                continue
+            valid, real_name = verify_ticker(name, ticker)
+            if not valid:
+                continue
+            stock["verified"] = True
+            stock["real_name"] = real_name
+            price_info = get_stock_price(ticker)
+            if price_info:
+                stock["price"] = price_info
+            valid_good.append(stock)
+        parsed["good"] = valid_good
+        parsed["bad"] = []
         result = jsonlib.dumps(parsed, ensure_ascii=False)
     except:
         pass
