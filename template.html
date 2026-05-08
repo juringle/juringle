@@ -101,7 +101,7 @@ fetch('/me').then(r=>r.json()).then(data=>{
 </div>
 
 <div class="resp">⚠️ 본 서비스는 AI 분석 참고용이며, 투자 책임은 본인에게 있습니다.</div>
-<div class="loading" id="loading"><div class="spinner"></div><div id="loading-msg">기사 읽는 중...</div></div>
+<div class="loading" id="loading"><div class="spinner"></div><div id="loading-msg">뉴스 본문을 읽고 있어요...</div></div>
 <div class="rbox" id="rbox">
 <div class="summary" id="summary"></div>
 <div class="tabs">
@@ -159,21 +159,33 @@ function go() {
     if (!u) { alert('URL을 입력해주세요!'); return; }
     document.getElementById('loading').style.display = 'block';
     document.getElementById('rbox').style.display = 'none';
-    var msgs = ['📰 기사 읽는 중...', '🔍 AI가 종목 분석 중...', '📊 관련주 검증 중...', '✅ 거의 다 됐어요...'];
-    var msgDone = false;
-    var mi = 0;
-    var mt = setInterval(function() {
-        mi = (mi + 1) % msgs.length;
-        var el = document.getElementById('loading-msg');
-        if(msgDone) return;
-        if (el) el.innerHTML = msgs[mi];
-    }, 7000);
+    var loadingEl = document.getElementById('loading-msg');
+    var loadingTimers = [];
+    var steps = [
+        { delay: 0, text: '뉴스 본문을 읽고 있어요...' },
+        { delay: 4000, text: '관련 이슈를 찾고 있어요...' },
+        { delay: 8000, text: '국내 주식과 연결하고 있어요...' },
+        { delay: 14000, text: '수혜 가능 종목을 검토하고 있어요...' },
+        { delay: 20000, text: '최종 투자 아이디어를 정리하고 있어요...' }
+    ];
+    function setLoadingText(text) {
+        if (loadingEl) loadingEl.innerHTML = text;
+    }
+    function hideLoading() {
+        loadingTimers.forEach(function(timer) { clearTimeout(timer); });
+        loadingTimers = [];
+        document.getElementById('loading').style.display = 'none';
+    }
+    steps.forEach(function(step) {
+        loadingTimers.push(setTimeout(function() {
+            setLoadingText(step.text);
+        }, step.delay));
+    });
     var x = new XMLHttpRequest();
     x.open('POST', '/analyze', true);
     x.setRequestHeader('Content-Type', 'application/json');
     x.onload = function() {
-        clearInterval(mt);
-        msgDone = false; document.getElementById('loading').style.display = 'none';
+        hideLoading();
         var d = JSON.parse(x.responseText);
         if (d.error) {
             document.getElementById('summary').innerHTML = '<span style="color:#EA4335">❌ ' + d.error + '</span>';
