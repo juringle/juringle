@@ -225,11 +225,300 @@ except:
     STOCK_DB = {}
     print("종목 DB 없음")
 
+try:
+    with open('stock_candidate_db.json', 'r', encoding='utf-8') as f:
+        STOCK_CANDIDATE_DB = _json.load(f)
+    print(f"후보 종목 DB 로드: {len(STOCK_CANDIDATE_DB)}개")
+except:
+    STOCK_CANDIDATE_DB = {}
+    print("후보 종목 DB 없음")
+
 def verify_ticker(name, ticker):
     # DB에서 바로 확인 - 빠르고 정확!
     if ticker in STOCK_DB:
         return True, STOCK_DB[ticker]
     return False, None
+
+def detect_article_modes(article_text, related_news):
+    combined_text = (article_text + "\n" + related_news).lower()
+
+    def find_signals(keywords):
+        matches = []
+        for keyword in keywords:
+            if keyword.lower() in combined_text:
+                matches.append(keyword)
+        return matches
+
+    matched_signals = {
+        "market_index": find_signals([
+            "코스피", "코스닥", "지수", "목표치", "랠리", "증시",
+            "비중 확대", "최선호 시장", "밸류에이션", "외국인 순매수", "리레이팅"
+        ]),
+        "industry_outlook": find_signals([
+            "업황", "사이클", "공급 부족", "수요 증가", "가격 상승", "CAPEX",
+            "투자 확대", "슈퍼사이클", "국산화", "수출 증가"
+        ]),
+        "company_news": [],
+        "policy": find_signals([
+            "정부", "정책", "지원", "육성", "규제 완화", "세액공제",
+            "보조금", "입찰", "공공 발주", "국책 사업"
+        ]),
+        "order_contract": find_signals([
+            "수주", "계약", "공급 계약", "납품", "장기공급", "MOU",
+            "LOI", "발주", "프로젝트"
+        ]),
+        "earnings": find_signals([
+            "실적", "영업이익", "매출", "순이익", "어닝 서프라이즈",
+            "마진", "흑자전환", "적자전환", "컨센서스"
+        ])
+    }
+
+    for ticker, item in list(STOCK_DB.items())[:]:
+        name = item.get("name", "") if isinstance(item, dict) else str(item)
+        if name and name.lower() in combined_text:
+            matched_signals["company_news"].append(f"{name}({ticker})")
+            if len(matched_signals["company_news"]) >= 20:
+                break
+
+    sector_signal_keywords = {
+        "반도체/AI": [
+            "AI 반도체", "HBM", "DRAM", "NAND", "메모리", "반도체"
+        ],
+        "원전/전력": [
+            "전력기기", "변압기", "전력망", "송전", "데이터센터 전력"
+        ],
+        "통신/데이터센터": [
+            "데이터센터 전력", "IDC", "서버랙", "광통신", "클라우드 인프라"
+        ],
+        "조선/해양": [
+            "조선", "LNG선", "선박", "해양플랜트"
+        ],
+        "방산": [
+            "방산", "무기", "수출 계약", "항공우주"
+        ],
+        "배터리/소재": [
+            "배터리", "양극재", "음극재", "전해액", "분리막"
+        ]
+    }
+    market_reason_sectors = [
+        sector for sector, keywords in sector_signal_keywords.items()
+        if find_signals(keywords)
+    ]
+
+    policy_execution_signals = [
+        signal for signal in matched_signals["policy"]
+        if signal in ["규제 완화", "세액공제", "보조금", "입찰", "공공 발주", "국책 사업"]
+    ]
+    modes = []
+    if len(matched_signals["market_index"]) >= 2:
+        modes.append("MARKET_INDEX_OUTLOOK")
+    if len(matched_signals["industry_outlook"]) >= 2:
+        modes.append("INDUSTRY_OUTLOOK")
+    if len(matched_signals["policy"]) >= 2 and policy_execution_signals:
+        modes.append("POLICY_NEWS")
+    if len(matched_signals["order_contract"]) >= 2:
+        modes.append("ORDER_CONTRACT_NEWS")
+    if len(matched_signals["earnings"]) >= 2:
+        modes.append("EARNINGS_NEWS")
+
+    if "MARKET_INDEX_OUTLOOK" in modes:
+        primary_mode = "MARKET_INDEX_OUTLOOK"
+    elif "INDUSTRY_OUTLOOK" in modes:
+        primary_mode = "INDUSTRY_OUTLOOK"
+    elif "POLICY_NEWS" in modes:
+        primary_mode = "POLICY_NEWS"
+    elif "ORDER_CONTRACT_NEWS" in modes:
+        primary_mode = "ORDER_CONTRACT_NEWS"
+    elif "EARNINGS_NEWS" in modes:
+        primary_mode = "EARNINGS_NEWS"
+    else:
+        primary_mode = "UNKNOWN"
+
+    return {
+        "primary_mode": primary_mode,
+        "modes": modes,
+        "market_reason_sectors": market_reason_sectors,
+        "matched_signals": matched_signals
+    }
+
+def build_candidate_prompt_section(article_text, related_news):
+    if not STOCK_CANDIDATE_DB:
+        return ""
+
+    article_modes = detect_article_modes(article_text, related_news)
+    print(f"기사 타입 판별: primary={article_modes['primary_mode']}, modes={article_modes['modes']}")
+    print(f"시장전망 원인 섹터: {article_modes['market_reason_sectors']}")
+    print(f"기사 타입 신호: {article_modes['matched_signals']}")
+    market_reason_sectors = article_modes["market_reason_sectors"]
+
+    combined_text = (article_text + "\n" + related_news).lower()
+    finance_direct_keywords = [
+        "거래대금", "브로커리지", "고객예탁금", "예탁금", "신용융자",
+        "IPO", "상장 주관", "IB 수익", "운용자산", "AUM", "증권사 실적",
+        "수수료 수익", "리테일 거래", "위탁매매"
+    ]
+    finance_direct_signals = [
+        keyword for keyword in finance_direct_keywords
+        if keyword.lower() in combined_text
+    ]
+    finance_gate_enabled = (
+        article_modes["primary_mode"] == "MARKET_INDEX_OUTLOOK"
+        and bool(market_reason_sectors)
+        and "금융/증권/보험" not in market_reason_sectors
+    )
+    print(f"금융 sector gate: enabled={finance_gate_enabled}, direct_signals={finance_direct_signals}")
+
+    def matched_terms(terms):
+        matches = []
+        for term in terms:
+            if not term:
+                continue
+            normalized = str(term).strip()
+            if normalized and normalized.lower() in combined_text:
+                matches.append(normalized)
+        return matches
+
+    semiconductor_core_terms = [
+        "AI 반도체", "HBM", "DRAM", "NAND", "메모리", "고대역폭메모리",
+        "서버용 메모리", "반도체 장비", "패키징", "테스트", "증착"
+    ]
+
+    scored_candidates = []
+    sector_scores = defaultdict(int)
+    for ticker, item in STOCK_CANDIDATE_DB.items():
+        related_matches = matched_terms(item.get("related_keywords", []))
+        trigger_matches = matched_terms(item.get("benefit_triggers", []))
+        theme_matches = matched_terms(item.get("themes", []))
+        context_matches = matched_terms([
+            item.get("subsector", ""),
+            item.get("value_chain_role", "")
+        ])
+
+        score = (
+            len(related_matches) * 3
+            + len(trigger_matches) * 2
+            + len(theme_matches) * 2
+            + len(context_matches)
+        )
+
+        # "상"은 실제 기사 매칭이 있을 때만 약한 보너스입니다.
+        if score > 0 and item.get("confidence_base") == "상":
+            score += 1
+
+        semiconductor_exception_matches = []
+        if item.get("sector") == "반도체/AI" and not related_matches:
+            theme_context_matches = theme_matches + context_matches
+            semiconductor_exception_matches = [
+                term for term in semiconductor_core_terms
+                if any(term in match for match in theme_context_matches)
+            ]
+
+        has_related_match = bool(related_matches) or len(semiconductor_exception_matches) >= 2
+        if not has_related_match or score < 3:
+            continue
+        if (
+            finance_gate_enabled
+            and item.get("sector") == "금융/증권/보험"
+            and not finance_direct_signals
+        ):
+            continue
+
+        matched = related_matches + trigger_matches + theme_matches + context_matches
+        if semiconductor_exception_matches:
+            matched.append(
+                "semiconductor_core_exception:" + ",".join(semiconductor_exception_matches)
+            )
+        scored_candidates.append((score, len(matched), ticker, item, matched))
+        sector_scores[item.get("sector", "")] += score
+
+    if not scored_candidates:
+        return ""
+
+    ranked_sectors = sorted(
+        sector_scores.items(),
+        key=lambda row: row[1],
+        reverse=True
+    )
+    top_sector_list = [
+        sector for sector in market_reason_sectors
+        if sector in sector_scores
+    ][:4]
+    for sector, sector_score in ranked_sectors:
+        if len(top_sector_list) >= 4:
+            break
+        if sector in top_sector_list:
+            continue
+        if 0 < len(market_reason_sectors) <= 2 and sector_score < 5:
+            continue
+        top_sector_list.append(sector)
+    top_sectors = set(top_sector_list)
+
+    print(f"article_modes 우선 섹터: {market_reason_sectors}")
+    print(f"최종 후보 top_sectors: {sorted(top_sectors)}")
+
+    scored_candidates.sort(
+        key=lambda row: (
+            1 if row[3].get("sector", "") in market_reason_sectors else 0,
+            row[0],
+            row[1],
+            1 if row[3].get("confidence_base") == "상" else 0
+        ),
+        reverse=True
+    )
+
+    max_total = 25
+    max_per_sector = 6
+    sector_counts = defaultdict(int)
+    candidates = []
+    for score, match_count, ticker, item, matched in scored_candidates:
+        sector = item.get("sector", "")
+        if sector not in top_sectors:
+            continue
+        sector_limit = (
+            1
+            if finance_gate_enabled and sector == "금융/증권/보험"
+            else max_per_sector
+        )
+        if sector_counts[sector] >= sector_limit:
+            continue
+        candidates.append((score, match_count, ticker, item, matched))
+        sector_counts[sector] += 1
+        if len(candidates) >= max_total:
+            break
+
+    if not candidates:
+        return ""
+
+    lines = []
+    detected_sectors = []
+    for score, match_count, ticker, item, matched in candidates:
+        sector = item.get("sector", "")
+        if sector not in detected_sectors:
+            detected_sectors.append(sector)
+        triggers = ", ".join(item.get("benefit_triggers", [])[:3])
+        keywords = ", ".join(item.get("related_keywords", [])[:5])
+        matched_summary = ", ".join(matched[:5])
+        lines.append(
+            f"- {item.get('name')}({ticker}) | sector: {sector} | {item.get('subsector')} | "
+            f"역할: {item.get('value_chain_role')} | 수혜 조건: {triggers} | "
+            f"키워드: {keywords} | 기본 확신도: {item.get('confidence_base')} | "
+            f"매칭: {matched_summary} | 점수: {score}"
+        )
+
+    print(f"후보군 섹터 감지: {', '.join(detected_sectors)}")
+    print(f"후보군 라인 수: {len(lines)}")
+    print(f"sector별 후보 수: {dict(sector_counts)}")
+
+    return """
+
+[추천 후보군 - """ + ", ".join(detected_sectors) + """]
+아래 후보군은 stock_candidate_db.json에서 기사 본문과 관련 뉴스의 키워드 매칭 점수로 선별한 상장 종목입니다.
+추천 후보군이 제공된 경우, 가능한 한 후보군 안에서만 good 종목을 고르세요.
+후보군 밖 종목은 매우 명확한 이유가 있을 때만 추천하세요.
+후보군에 있어도 뉴스와 연결이 약하면 추천하지 마세요.
+후보군의 value_chain_role, benefit_triggers, related_keywords를 근거로 추천 이유를 작성하세요.
+confidence_base가 "상"이어도 기사와 직접 매칭되지 않으면 추천하지 마세요.
+""" + "\n".join(lines)
 
 
 def get_related_news(article_text):
@@ -291,6 +580,7 @@ def analyze_stocks_stream(article_text, analyze_start=None):
     print(f"관련 뉴스 추가됨: {len(related_news)}자")
     if analyze_start:
         print(f"[PERF] claude_analysis_start: {time.perf_counter() - analyze_start:.2f}s")
+    candidate_section = build_candidate_prompt_section(article_text, related_news)
     
     prompt = """당신은 월가와 여의도를 모두 경험한 최고 수준의 한국 주식 애널리스트 팀입니다.
 아래 뉴스를 읽고 "시장이 아직 주목하지 못한" 숨겨진 수혜/피해 종목을 발굴하세요.
@@ -326,7 +616,7 @@ def analyze_stocks_stream(article_text, analyze_start=None):
 마크다운 기호는 절대 사용하지 마세요.
 
 기사 내용:
-""" + article_text + related_news + """
+""" + article_text + related_news + candidate_section + """
 
 반드시 아래 JSON 형식으로만 답변하세요. 다른 텍스트는 절대 포함하지 마세요.
 good은 최대 5개까지 배열로 작성하세요.
