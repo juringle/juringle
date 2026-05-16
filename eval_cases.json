@@ -1,0 +1,365 @@
+[
+  {
+    "id": "EVAL-001",
+    "title": "골드만삭스 코스피 목표치 상향 시장 전망",
+    "url": "https://www.asiatime.co.kr/article/20260509500002",
+    "article_type": "MARKET_INDEX_OUTLOOK",
+    "expected_sectors": [
+      "반도체/AI"
+    ],
+    "expected_subthemes": [
+      "HBM/메모리",
+      "후공정/패키징",
+      "반도체 장비"
+    ],
+    "preferred_candidates": [
+      "한미반도체",
+      "주성엔지니어링"
+    ],
+    "acceptable_candidates": [
+      "ISC",
+      "리노공업",
+      "원익IPS",
+      "유진테크",
+      "티씨케이"
+    ],
+    "must_exclude_candidates": [
+      "미래에셋증권",
+      "키움증권",
+      "한국금융지주",
+      "KB금융"
+    ],
+    "direct_listed_entities": [],
+    "mentioned_entities": [
+      "골드만삭스"
+    ],
+    "notes": "시장전망 기사지만 상승 근거가 반도체 이익 사이클인지 확인"
+  },
+  {
+    "id": "EVAL-002",
+    "title": "중동발 원자재 수급난에 건설현장 초비상",
+    "url": "https://www.asiatime.co.kr/article/20260402500273",
+    "article_type": "INDUSTRY_OUTLOOK",
+    "expected_sectors": [
+      "건설/인프라",
+      "철강/화학/소재"
+    ],
+    "expected_subthemes": [
+      "시멘트/레미콘",
+      "건자재",
+      "원자재 가격"
+    ],
+    "preferred_candidates": [
+      "삼표시멘트",
+      "한일시멘트",
+      "LX하우시스"
+    ],
+    "acceptable_candidates": [
+      "성신양회",
+      "유진기업",
+      "아세아시멘트",
+      "애경케미칼"
+    ],
+    "must_exclude_candidates": [
+      "미래에셋증권",
+      "키움증권",
+      "한미반도체",
+      "ISC"
+    ],
+    "direct_listed_entities": [],
+    "mentioned_entities": [
+      "중동",
+      "건설현장"
+    ],
+    "notes": "원자재 가격 기사에서 건설자재와 시멘트 중심 추천 여부 확인"
+  },
+  {
+    "id": "EVAL-003",
+    "title": "조선 빅3, 고선가 수주 전략 통했다",
+    "url": "https://www.asiatime.co.kr/article/20260406500126",
+    "article_type": "INDUSTRY_OUTLOOK",
+    "expected_sectors": [
+      "조선/해양"
+    ],
+    "expected_subthemes": [
+      "LNG선",
+      "고선가 선박",
+      "보냉재",
+      "선박 엔진"
+    ],
+    "preferred_candidates": [
+      "동성화인텍",
+      "세진중공업",
+      "HD현대마린엔진"
+    ],
+    "acceptable_candidates": [
+      "한국카본"
+    ],
+    "must_exclude_candidates": [
+      "미래에셋증권",
+      "키움증권",
+      "한미반도체",
+      "ISC"
+    ],
+    "direct_listed_entities": [],
+    "mentioned_entities": [
+      "조선 빅3"
+    ],
+    "notes": "직접 조선사보다 기자재, 엔진, 보냉재 후보가 우선되는지 확인"
+  },
+  {
+    "id": "EVAL-004",
+    "title": "K조선, 美 MRO 시장 공략 박차",
+    "url": "https://www.asiatime.co.kr/article/20260211500264",
+    "article_type": "ORDER_CONTRACT_NEWS",
+    "expected_sectors": [
+      "조선/해양",
+      "방산"
+    ],
+    "expected_subthemes": [
+      "MRO/특수선",
+      "함정 정비",
+      "조선 기자재"
+    ],
+    "preferred_candidates": [
+      "HD현대마린엔진",
+      "세진중공업",
+      "동성화인텍"
+    ],
+    "acceptable_candidates": [
+      "SK오션플랜트",
+      "한국카본"
+    ],
+    "must_exclude_candidates": [
+      "미래에셋증권",
+      "키움증권",
+      "한미반도체"
+    ],
+    "direct_listed_entities": [],
+    "mentioned_entities": [
+      "K조선",
+      "미국 MRO"
+    ],
+    "notes": "MRO를 항공 일반이 아니라 조선/방산 조선 밸류체인으로 해석해야 함"
+  },
+  {
+    "id": "EVAL-005",
+    "title": "K배터리, ESS로 활로 모색",
+    "url": "https://www.asiatime.co.kr/article/20260108500243",
+    "article_type": "INDUSTRY_OUTLOOK",
+    "expected_sectors": [
+      "배터리/소재",
+      "원전/전력"
+    ],
+    "expected_subthemes": [
+      "ESS",
+      "전해액",
+      "전고체",
+      "배터리 소재"
+    ],
+    "preferred_candidates": [
+      "엔켐",
+      "동화기업",
+      "이수스페셜티케미컬"
+    ],
+    "acceptable_candidates": [
+      "탑머티리얼",
+      "원익피앤이",
+      "삼성SDI",
+      "SK아이이테크놀로지"
+    ],
+    "must_exclude_candidates": [
+      "미래에셋증권",
+      "키움증권",
+      "코스맥스",
+      "한국콜마"
+    ],
+    "direct_listed_entities": [],
+    "mentioned_entities": [
+      "K배터리",
+      "ESS"
+    ],
+    "notes": "ESS 확대 기사에서 배터리 소재와 장비 후보 중심으로 나오는지 확인"
+  },
+  {
+    "id": "EVAL-006",
+    "title": "전력망 신기술 쏟아낸 변압기 3사",
+    "url": "https://www.hankyung.com/article/2026020571851",
+    "article_type": "POLICY_NEWS",
+    "expected_sectors": [
+      "원전/전력"
+    ],
+    "expected_subthemes": [
+      "변압기/전력기기",
+      "전선/송배전",
+      "HVDC"
+    ],
+    "preferred_candidates": [
+      "HD현대일렉트릭",
+      "대한전선",
+      "효성중공업"
+    ],
+    "acceptable_candidates": [
+      "일진전기",
+      "엘에스일렉트릭"
+    ],
+    "must_exclude_candidates": [
+      "미래에셋증권",
+      "키움증권",
+      "한미반도체",
+      "ISC"
+    ],
+    "direct_listed_entities": [],
+    "mentioned_entities": [
+      "변압기 3사"
+    ],
+    "notes": "전력망/변압기 수혜 후보가 정확히 나와야 함"
+  },
+  {
+    "id": "EVAL-007",
+    "title": "韓 자동차·배터리 업계, 美 정책에 휘청",
+    "url": "https://www.asiatime.co.kr/article/20260209500308",
+    "article_type": "POLICY_NEWS",
+    "expected_sectors": [
+      "자동차/전기차",
+      "배터리/소재"
+    ],
+    "expected_subthemes": [
+      "관세/IRA",
+      "자동차 부품",
+      "열관리",
+      "배터리 소재"
+    ],
+    "preferred_candidates": [
+      "HL만도",
+      "한온시스템",
+      "현대글로비스"
+    ],
+    "acceptable_candidates": [
+      "현대모비스",
+      "성우하이텍",
+      "화신",
+      "엔켐"
+    ],
+    "must_exclude_candidates": [
+      "삼성카드",
+      "한미반도체",
+      "미래에셋증권",
+      "키움증권"
+    ],
+    "direct_listed_entities": [],
+    "mentioned_entities": [
+      "한국 자동차·배터리 업계",
+      "미국 정책"
+    ],
+    "notes": "정책 충격 기사에서 자동차/배터리 후보가 열리는지 확인"
+  },
+  {
+    "id": "EVAL-008",
+    "title": "소외됐던 K뷰티, 봄 맞아 화색",
+    "url": "https://www.hankyung.com/article/2026031804601",
+    "article_type": "EARNINGS_NEWS",
+    "expected_sectors": [
+      "화장품/소비재"
+    ],
+    "expected_subthemes": [
+      "ODM/OEM",
+      "K뷰티 수출",
+      "미국/일본 채널"
+    ],
+    "preferred_candidates": [
+      "코스맥스",
+      "한국콜마",
+      "코스메카코리아"
+    ],
+    "acceptable_candidates": [
+      "실리콘투",
+      "에이피알",
+      "브이티"
+    ],
+    "must_exclude_candidates": [
+      "미래에셋증권",
+      "키움증권",
+      "한미반도체",
+      "ISC"
+    ],
+    "direct_listed_entities": [],
+    "mentioned_entities": [
+      "K뷰티"
+    ],
+    "notes": "브랜드보다 ODM/OEM과 수출 채널 후보가 우선되는지 확인"
+  },
+  {
+    "id": "EVAL-009",
+    "title": "140조원 시장 잡아라 제약·바이오업계 비만약 올인",
+    "url": "https://www.asiatime.co.kr/article/20260507500266",
+    "article_type": "INDUSTRY_OUTLOOK",
+    "expected_sectors": [
+      "바이오/헬스케어"
+    ],
+    "expected_subthemes": [
+      "비만/대사질환",
+      "GLP-1",
+      "신약/임상"
+    ],
+    "preferred_candidates": [
+      "한미약품",
+      "유한양행",
+      "대웅제약"
+    ],
+    "acceptable_candidates": [
+      "삼성바이오로직스",
+      "알테오젠",
+      "에이비엘바이오"
+    ],
+    "must_exclude_candidates": [
+      "한국콜마",
+      "코스맥스",
+      "미래에셋증권",
+      "한미반도체"
+    ],
+    "direct_listed_entities": [],
+    "mentioned_entities": [
+      "제약·바이오업계",
+      "비만약"
+    ],
+    "notes": "기존 실패 케이스. 바이오 후보군 개방 여부가 핵심"
+  },
+  {
+    "id": "EVAL-010",
+    "title": "글로벌 항공 매출 1조 달러 시대",
+    "url": "https://www.hankyung.com/article/2026010406431",
+    "article_type": "EARNINGS_NEWS",
+    "expected_sectors": [
+      "항공/여행/면세"
+    ],
+    "expected_subthemes": [
+      "국제선",
+      "여객",
+      "항공유/환율",
+      "면세/호텔"
+    ],
+    "preferred_candidates": [
+      "대한항공",
+      "진에어",
+      "제주항공"
+    ],
+    "acceptable_candidates": [
+      "한진칼",
+      "호텔신라",
+      "파라다이스",
+      "GKL"
+    ],
+    "must_exclude_candidates": [
+      "삼성화재해상보험",
+      "미래에셋증권",
+      "키움증권",
+      "한미반도체"
+    ],
+    "direct_listed_entities": [],
+    "mentioned_entities": [
+      "글로벌 항공업"
+    ],
+    "notes": "항공 업황 기사에서 금융/보험 노이즈 억제 필요"
+  }
+]
