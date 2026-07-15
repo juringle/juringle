@@ -198,10 +198,18 @@ def get_article(url):
 def get_stock_price(ticker):
     try:
         import yfinance as yf
-        stock = yf.Ticker(ticker + ".KS")
-        info = stock.fast_info
-        price = info.last_price
-        prev = info.previous_close
+        price = None
+        prev = None
+        for suffix in [".KS", ".KQ"]:
+            try:
+                stock = yf.Ticker(ticker + suffix)
+                info = stock.fast_info
+                price = info.last_price
+                prev = info.previous_close
+                if price and prev:
+                    break
+            except:
+                continue
         if price and prev:
             change = price - prev
             change_pct = (change / prev) * 100

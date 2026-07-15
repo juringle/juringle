@@ -42,8 +42,14 @@ def check_prices():
     for row in rows:
         rec_id, ticker, price_at, created_at = row
         try:
-            stock = yf.Ticker(ticker + ".KS")
-            current = stock.fast_info.last_price
+            current = None
+            for suffix in [".KS", ".KQ"]:
+                try:
+                    current = yf.Ticker(ticker + suffix).fast_info.last_price
+                    if current:
+                        break
+                except:
+                    continue
             if current and price_at:
                 return_1w = ((current - price_at) / price_at) * 100
                 c.execute("""
